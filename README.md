@@ -1,5 +1,5 @@
 # ossec_report
-A Python script for simple reporting of OSSEC alerts using JSON format.
+A python script for simple reporting of OSSEC alerts in JSON format
 # installation
 A ossec installation is requierd. I used version 3.7.0.   
 Move main.py to ```/var/ossec/bin/```
