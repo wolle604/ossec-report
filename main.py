@@ -2,7 +2,7 @@ import json
 import re
 import toml
 from os.path import exists
-from Levenshtein import ratio
+from Levenshtein import ratio #for string similarity
 
 config = toml.load("config.toml")
 hosts = config['options']['hosts']
