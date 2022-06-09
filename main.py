@@ -50,7 +50,7 @@ if exists(config['options']['alertspath']):  # Only do if logs exist
                     jsonlogfulllog = str(jsonlog['full_log'])
                     new_metric = ratio(logfulllog, jsonlogfulllog)
                     if (new_metric > levenshtein):
-                        levenshtein = new_metric
+                        levenshtein = new_metric #levenshtein decimal betwenn 1=equal and 0=nothing equal
                 if logdetails:
                     pattern_log = f"{pattern}, {str(logdetails).translate(sep)}"
                 if re.search(re.escape(pattern), str(log), re.IGNORECASE):
