@@ -1,0 +1,6 @@
+[options]
+hosts = ["dbsever", "webserver","tessystem"]#
+alertspath = "alerts.json"
+agentstate = "not_connected"
+fields = ["srcip", "dstuser", "url", "status", "extra_data"]
+field_text = ["SrcIP:", "User:", "URL:", "Status:", "Extra Data:"]
