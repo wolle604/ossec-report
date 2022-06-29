@@ -32,7 +32,7 @@ Configure your email client, i use msmtp
 ## ossec config 
 for more accurate check, change the following attribute to lower value in ```/var/ossec/etc/internal_options.conf```
   ```
-  monitord.notify_time=180
+  monitord.notify_time=300
   ```
 To activate json logging add the following into ```/var/ossec/etc/ossec.conf``` at global options:
 ```
