@@ -30,21 +30,21 @@ if exists(config['options']['alertspath']):  # Only do if logs exist
             condition = True
             pattern = r'Host: ' + agent + ', Rule: ' + rule + ', Desc: ' + comment + ', Logfile: ' + logfile
             logdetails = []
-            if not re.search(r"'decoder':", str(jsonlog)):
+            if not re.search(r"'decoder':", str(jsonlog)):  #if the logline has no decoder, it have none extra fields
                 decoder = "Unkown"
             else:
                 decoder = str(jsonlog["decoder"])
-            for field in fields:
+            for field in fields: #check if configured fields in logline, and append to logdetails if they exist
                 pattern_field = field
                 if re.search(re.compile(r"'" + field + r"':"), str(jsonlog)):
                     index_field = [i for i, field in enumerate(fields) if
                                    re.search(pattern_field, str(field), re.IGNORECASE)]
                     if index_field:
                         logdetails.append(str(field_text[int(index_field[0])]) + " " + str(jsonlog[field]))
-            if str(jsonlog).__contains__("windows") or decoder == "Unkown" or str(jsonlog).__contains__("Unknown problem somewhere in the system.") or str(jsonlog).__contains__("Non standard syslog message (size too large)."):
+            if str(jsonlog).__contains__("windows") or decoder == "Unkown" or str(jsonlog).__contains__("Unknown problem somewhere in the system.") or str(jsonlog).__contains__("Non standard syslog message (size too large)."):# in special cases i want to append whole original log
                 logdetails.append(f"Full log: StartFullLog {str(jsonlog['full_log'])} EndFullLog")
-            for log in logs:
-                levenshtein = 0
+            for log in logs:    # check if logline which should be inserted already exists. If the whole log line is appended, only an approximation is possible because of the different timestamp formats.
+                levenshtein = 0  # conditon true means = insert and false = no insertion, but count for logline
                 if str(log).__contains__("StartFullLog"):
                     logfulllog = str(log).split("StartFullLog ", 1)[1].split(" EndFullLog", 1)[0]
                     jsonlogfulllog = str(jsonlog['full_log'])
@@ -61,7 +61,7 @@ if exists(config['options']['alertspath']):  # Only do if logs exist
                         condition = True
                 else:
                     condition = True
-            if condition:
+            if condition: #insertion of uniqe logline
                 if decoder.__contains__("syscheck_integrity"):
                     logs.append(
                         f"Time: {jsonlog['timestamp']}, Host: {jsonlog['agent_name']}, Rule: {jsonlog['rule']['sidid']}, "
@@ -77,13 +77,13 @@ if exists(config['options']['alertspath']):  # Only do if logs exist
                         f"Time: {jsonlog['timestamp']}, Host: {jsonlog['agent_name']}, Rule: {jsonlog['rule']['sidid']}, "
                         f"Desc: {jsonlog['rule']['comment']}, Logfile: {jsonlog['logfile']}, {str(logdetails).translate(sep)}, Decoder: "
                         f"{decoder}")
-            elif not condition:
+            elif not condition: #  Suspression for duplicated logs. Appending "+ More" to processed logline, because logline alredy exists
                 fullloginlog = False
                 for detail in logdetails:
                     if detail.__contains__("Full log:"):
                         fullloginlog = True
                         break
-                if fullloginlog:
+                if fullloginlog: #if full log line is appended wie use levenshtein to determine the equality.
                     if logdetails:
                         pattern_details = pattern + ", " + str(logdetails).translate(sep)
                     levenshteinmore = 0
@@ -91,7 +91,7 @@ if exists(config['options']['alertspath']):  # Only do if logs exist
                         new_metricmore = ratio(pattern_details, log)
                         if new_metric > levenshteinmore:
                             levenshteinmore = new_metric
-                    index = [i for i, log in enumerate(logs) if re.search(re.escape(pattern), str(log), re.IGNORECASE) and levenshteinmore > 0.925]
+                    index = [i for i, log in enumerate(logs) if re.search(re.escape(pattern), str(log), re.IGNORECASE) and levenshteinmore > 0.92]
                     if index:
                         temp = logs[int(index[0])]
                         logs[int(index[0])] = f"{str(temp)} + More"
@@ -103,8 +103,8 @@ if exists(config['options']['alertspath']):  # Only do if logs exist
                         temp = logs[int(index[0])]
                         logs[int(index[0])] = f"{str(temp)} + More"
 
-    # Suspression for duplicated logs
-    for log in logs:
+
+    for log in logs:   #count "+ Mores" and replace with counted number
         temp = log
         morecount = temp.count("+ More")
         if morecount > 0:
