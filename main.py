@@ -129,6 +129,7 @@ for host in hosts:
     if not printok:
         print(f"OK. No alerts found for {host}")
     print("------------------\n")
+# Print entrys for each syslog host
 for host in list(sysloghost.keys()):
     print(f"Agentless System: {host} \n------------------")
     printok = ""

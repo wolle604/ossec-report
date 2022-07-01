@@ -1,5 +1,6 @@
 [options]
-hosts = ["dbsever", "webserver","tessystem"]#
+hosts = ["dbserver", "webserver","tessystem"]
+sysloghosts = {Router = "1.2.3.4"}
 alertspath = "alerts.json"
 agentstate = "not_connected"
 fields = ["srcip", "dstuser", "url", "status", "extra_data"]
