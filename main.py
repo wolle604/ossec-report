@@ -58,7 +58,7 @@ if exists(config['options']['alertspath']):  # Only do if logs exist
                                            re.search(pattern_field, str(field), re.IGNORECASE)]
                             if index_field:
                                 logdetails.append(str(field_text[int(index_field[0])]) + " " + str(jsonlog[field]))
-                    if str(jsonlog).__contains__("windows") or str(jsonlog).__contains__("Unknown problem somewhere in the system.") or str(jsonlog).__contains__("Non standard syslog message (size too large).") or str(jsonlog).__contains__("Unknown Syslog Line") or displayFullLog:# in special cases i want to append whole original log
+                    if str(jsonlog).__contains__("windows") or str(jsonlog).__contains__("Unknown problem somewhere in the system.") or str(jsonlog).__contains__("Non standard syslog message (size too large).") or str(jsonlog).__contains__("Unknown Syslog Line") or displayFullLog and decoder == "Unknown":# in special cases i want to append whole original log
                         logdetails.append(f"Full log: StartFullLog {jsonlog['full_log']} EndFullLog")
                     for log in logs:    # check if logline which should be inserted already exists. If the whole log line is appended, only an approximation is possible because of the different timestamp formats.
                         levenshtein = 0  # conditon true means = insert and false = no insertion, but count for logline
