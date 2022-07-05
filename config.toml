@@ -1,10 +1,11 @@
 [options]
-hosts = ["dbserver", "webserver","tessystem"]
+hosts = ["dbserver", "webserver","testsystem"]
 sysloghosts = {Router = "1.2.3.4"}
-alertspath = "alerts_old.json"
+alertspath = "alerts.json"
 agentstate = "not_connected"
 fields = ["srcip", "dstuser", "url", "status", "extra_data"]
 field_text = ["SrcIP:", "User:", "URL:", "Status:", "Extra Data:"]
 alertlevel = 3
-dontreportrules = ["1111"]
+dontreportrules = [1111,1234]
 displayFullLogifDecoderUnknown = false
+ConfigureFulllogstrings = ["windows","nknown problem somewhere in the system.","Non standard syslog message (size too large).","Unknown Syslog Line"]
