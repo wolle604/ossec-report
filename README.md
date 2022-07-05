@@ -9,13 +9,15 @@ install following packages:
 - toml
 - python-regex 
 - Levenshtein
+
+Otherwise you can use the provided pyinstaller binary archive ```logreportbinary.tar``` with the main binary file. In this case the configuration must be in the /var/ossec/etc directory.
    
 Modify alerts json log path in cofnig.toml:
 ```
 alertspath = "/var/ossec/logs/alerts/alerts.json"
 agentstate = "/var/ossec/logs/not_connected"
 ```
-After that you have to insert your agentnames in config.toml:  
+After that you have to insert your agentnames in hosts and your ips with a name for syslog clients in config.toml:  
 ```
 hosts = ["dbserver", "webserver","testsystem"]
 ```
