@@ -17,9 +17,38 @@ Modify alerts json log path in cofnig.toml:
 alertspath = "/var/ossec/logs/alerts/alerts.json"
 agentstate = "/var/ossec/logs/not_connected"
 ```
-After that you have to insert your agentnames in hosts and your ips with a name for syslog clients in config.toml:  
+After that you have to configure the logreport in the config.toml:  
+Insert Agentnames:
 ```
 hosts = ["dbserver", "webserver","testsystem"]
+```
+Insert now your Systems that only forward their logs to the manager.
+```
+sysloghosts = {Router = "1.2.3.4",Firewall = "1.2.3.5" }
+```
+Now configure all fields that should displayed if they exists. Take a look at the mentioned fields down below.
+You can also modify the displayed text for each field. Keep in mind that each field has its own label and that the row order corresponds to the fields.
+```
+fields = ["srcip", "dstuser", "url", "status", "extra_data"]
+field_text = ["SrcIP:", "User:", "URL:", "Status:", "Extra Data:"]
+```
+You can set the alert level to control at wich alert level the alarms should be displayed.
+```
+alertlevel = 3
+```
+If you want to suspress alerts of a specific rule id you can insert them here.
+```
+dontreportrules = [1111,1234]
+```
+Sometimes the full log appending causes that suspressing doesnt work properly (string similarity is complicated if many chars are changing).
+To avoid appending the full log you can deactivate it by default.
+```
+displayFullLogifDecoderUnknown = false
+```
+But if you have some Rules that always should append the full log you can insert a string which occour in the json data. E. g. decoder, rule id or description
+But be careful to choose a string, that doesnt produce a false positiv.
+```
+ConfigureFulllogstrings = ["windows","Unknown problem somewhere in the system.","Non standard syslog message (size too large).","Unknown Syslog Line"]
 ```
 and modify config.toml path in main.py:
 ```
