@@ -16,6 +16,7 @@ ruleids = config['options']['dontreportrules']
 sysloghost = config['options']['sysloghosts']
 displayFullLog = config['options']['displayFullLogifDecoderUnknown']
 fullogstrings = config['options']['ConfigureFulllogstrings']
+data = []
 
 def checkIP(ip):
     regex = "^((25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\.){3}(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])$"
@@ -138,26 +139,38 @@ if exists(config['options']['alertspath']):  # Only do if logs exist
 for host in hosts:
     print(f"System: {host} \n------------------")
     printok = ""
+    data_logs = []
     for log in logswnumber:
         if re.search(re.escape("Host: " + str(host)), str(log), re.IGNORECASE):
             print(str(log).replace(' StartFullLog', '').replace('EndFullLog', ''))
             printok = True
+            data_logs.append({"log": str(log).replace(' StartFullLog', '').replace('EndFullLog', '')})
     if not printok:
         print(f"OK. No alerts found for {host}")
+        data_logs.append({"log": "OK. No alerts found."})
     print("------------------\n")
+    data.append({"host": str(host), "logs": data_logs})
 # Print entrys for each syslog host
 for host in list(sysloghost.keys()):
     print(f"Agentless System: {host} \n------------------")
     printok = ""
+    data_logs = []
     for log in logswnumber:
         if re.search(re.escape("Host: " + str(host)), str(log), re.IGNORECASE):
             print(str(log).replace(' StartFullLog', '').replace('EndFullLog', ''))
             printok = True
+            data_logs.append({"log": str(log).replace(' StartFullLog', '').replace('EndFullLog', '')})
     if not printok:
         print(f"OK. No alerts found for {host}")
+        data_logs.append({"log": "OK. No alerts found."})
     print("------------------\n")
+    data.append({"host": str(host), "logs": data_logs})
 print(f"Total lines of alerts: {length}")
 print(f"filtered alerts: {len(logswnumber)}")
+
+if config['options']['reportJSON']:
+    with open("report.json","w") as file:
+       json.dump(data, file, indent=2, sort_keys=True)
 
 # Check agent state
 if exists(config['options']['agentstate']):  # Only do if file exists
