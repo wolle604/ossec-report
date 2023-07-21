@@ -2,7 +2,6 @@ import json
 import re
 import toml
 from os.path import exists
-from Levenshtein import ratio  # for string similarity
 
 config = toml.load("config.toml")
 hosts = config['options']['hosts']
@@ -69,16 +68,15 @@ if exists(config['options']['alertspath']):  # Only do if logs exist
                         condition = False
                         break
                     levenshtein = 0  # conditon true means = insert and false = no insertion, but count for logline
+                    sep = {39: '', 91: '', 93: ''}
+                    cleaned_logdetails = ''.join(ch if ch not in sep else sep[ch] for ch in logdetails)
                     if str(log).__contains__("StartFullLog"):
                         logfulllog = str(log).split("StartFullLog ", 1)[1].split(" EndFullLog", 1)[0]
-                        jsonlogfulllog = str(jsonlog['full_log'])
-                        new_metric = ratio(logfulllog, jsonlogfulllog)
-                        if (new_metric >= levenshtein):
-                            levenshtein = new_metric  # levenshtein decimal betwenn 1=equal and 0=nothing equal
+                        jsonlogfulllog = jsonlog['full_log']
                     if logdetails:
-                        pattern_log = f"{pattern}, {str(logdetails).translate(sep)}"
+                        pattern_log = f"{pattern}, {cleaned_logdetails}"
                     if re.search(re.escape(pattern), str(log), re.IGNORECASE):
-                        if re.search(re.escape(pattern_log), str(log), re.IGNORECASE) or levenshtein > 0.92:
+                        if re.search(re.escape(pattern_log), str(log), re.IGNORECASE):
                             condition = False
                             break
                         else:
@@ -99,27 +97,17 @@ if exists(config['options']['alertspath']):  # Only do if logs exist
                     else:
                         logs.append(
                             f"Time: {jsonlog['timestamp']}, Host: {agent}, Rule: {jsonlog['rule']['sidid']}, "
-                            f"Desc: {jsonlog['rule']['comment']}, Logfile: {jsonlog['logfile']}, {str(logdetails).translate(sep)}, Decoder: "
+                            f"Desc: {jsonlog['rule']['comment']}, Logfile: {jsonlog['logfile']}, {cleaned_logdetails}, Decoder: "
                             f"{decoder}")
                 elif not condition:  # Suspression for duplicated logs. Appending "+ More" to processed logline, because logline alredy exists
-                    fullloginlog = False
-                    for detail in logdetails:
-                        if detail.__contains__("Full log:"):
-                            fullloginlog = True
-                            break
-                    if fullloginlog:  # if full log line is appended wie use levenshtein to determine the equality.
-                        pattern_details = pattern + ", " + str(logdetails).translate(sep)
-                        index = [i for (i, log) in enumerate(logs) if (ratio(pattern_details,
-                                                                             str(re.sub(r', Decoder: .*', "",
-                                                                                        str(re.sub(r'^Time(.*?), ',
-                                                                                                   "",
-                                                                                                   log))))) >= 0.92)]
-                        if index:
-                            temp = logs[int(index[0])]
-                            logs[int(index[0])] = f"{str(temp)} + More"
+                    pattern_details = pattern + ", " + cleaned_logdetails
+                    index = [i for (i, log) in enumerate(logs) if (pattern_details == str(re.sub(r', Decoder: .*', "", str(re.sub(r'^Time(.*?), ', "", log)))))]
+                    if index:
+                        temp = logs[int(index[0])]
+                        logs[int(index[0])] = f"{str(temp)} + More"
                     else:
                         if logdetails:
-                            pattern = pattern + ", " + str(logdetails).translate(sep)
+                            pattern = pattern + ", " + cleaned_logdetails
                         index = [i for i, log in enumerate(logs) if
                                  re.search(re.escape(pattern), str(log), re.IGNORECASE)]
                         if index:
