@@ -47,6 +47,7 @@ if exists(config['options']['alertspath']):  # Only do if logs exist
                 condition = True
                 pattern = r'Host: ' + agent + ', Rule: ' + rule + ', Desc: ' + comment + ', Logfile: ' + logfile
                 logdetails = []
+                cleaned_logdetails = ''
                 if not re.search(r"'decoder':",
                                  str(jsonlog)):  # if the logline has no decoder, it has no extra fields
                     decoder = "Unknown"
