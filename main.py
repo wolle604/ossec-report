@@ -47,6 +47,7 @@ if exists(config['options']['alertspath']):  # Only do if logs exist
                 condition = True
                 pattern = r'Host: ' + agent + ', Rule: ' + rule + ', Desc: ' + comment + ', Logfile: ' + logfile
                 logdetails = []
+                cleaned_logdetails = ''
                 if not re.search(r"'decoder':",
                                  str(jsonlog)):  # if the logline has no decoder, it has no extra fields
                     decoder = "Unknown"
@@ -101,7 +102,7 @@ if exists(config['options']['alertspath']):  # Only do if logs exist
                             f"{decoder}")
                 elif not condition:  # Suspression for duplicated logs. Appending "+ More" to processed logline, because logline alredy exists
                     pattern_details = pattern + ", " + cleaned_logdetails
-                    index = [i for (i, log) in enumerate(logs) if (pattern_details == str(re.sub(r', Decoder: .*', "", str(re.sub(r'^Time(.*?), ', "", log)))))]
+                    index = [i for (i, log) in enumerate(logs) if pattern_details in log]
                     if index:
                         temp = logs[int(index[0])]
                         logs[int(index[0])] = f"{str(temp)} + More"
@@ -113,7 +114,6 @@ if exists(config['options']['alertspath']):  # Only do if logs exist
                         if index:
                             temp = logs[int(index[0])]
                             logs[int(index[0])] = f"{str(temp)} + More"
-
         for log in logs:  # count "+ Mores" and replace with counted number
             temp = log
             morecount = temp.count("+ More")
