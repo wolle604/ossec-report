@@ -1,12 +1,12 @@
 [options]
-hosts = ["webserver","dbserver","testsystem"]
-sysloghosts = {Router = "1.2.3.4",Firewall = "1.2.3.5" }
-alertspath = "alerts.json"
-agentstate = "not_connected"
-fields = ["srcip", "dstuser", "url", "status", "extra_data"]
-field_text = ["SrcIP:", "User:", "URL:", "Status:", "Extra Data:"]
-alertlevel = 3
-dontreportrules = [1111,1234]
-displayFullLogifDecoderUnknown = false
-ConfigureFulllogstrings = ["windows","Unknown problem somewhere in the system.","Non standard syslog message (size too large).","Unknown Syslog Line"]
-reportJSON = true
+hosts = ["webserver","dbserver","testsystem"]              #Agent names which should be reported
+sysloghosts = {Router = "1.2.3.4",Firewall = "1.2.3.5" }   #Report syslog hosts, name and IP required
+alertspath = "alerts.json"                                 #Ossec json alert file
+agentstate = "not_connected"                               #File for agent state, should be updated through a cronjob 
+fields = ["srcip", "dstuser", "url", "status", "extra_data"]  #Fields which should be displayed
+field_text = ["SrcIP:", "User:", "URL:", "Status:", "Extra Data:"]  #Individual description for the fields
+alertlevel = 3                                             #Alert level for alerts that should be reported
+dontreportrules = [1111,1234]                              #Insert rule id's that shouldn't be reported
+displayFullLogifDecoderUnknown = false                     #If the decoder is unknown the full_log field will be added
+ConfigureFulllogstrings = ["windows","Unknown problem somewhere in the system.","Non standard syslog message (size too large).","Unknown Syslog Line"] #Display always the full_log (Is not deactivated by displayFullLogifDecoderUnknown)
+reportJSON = true                                          #Activate json output to the path where the script runs
