@@ -9,7 +9,7 @@ install following packages:
 - toml (Included in Python 3.11)
 - python-regex 
    
-Modify alerts json log path in cofnig.toml:
+Modify alerts json log path in cofnig.toml (Specific descriptions are included as comments in config.toml):
 ```
 alertspath = "/var/ossec/logs/alerts/alerts.json"
 agentstate = "/var/ossec/logs/not_connected"
@@ -42,7 +42,8 @@ The script has following features:
 - Reporting alerts
   - Duplicated alerts will be suspressed except syscheck (FIM) (Every alert is a change in your system, and shouldn't be suspressed). Only the first alert will be shown. The script will append the "Duplicated messages suspressed!" and the total amount of this alert.
   - If decoder is unknown (=means no processed fields), alert 1002 (Unknown problem...) is raised or alert is a Windows alert, the script will append full log to line.
-    Because of different timestamp an format of it, it is very difficulty to check if the same alert is alredy displayed. Because of this i used the following bash script that removes the leading timestamp of the full_log field. There is a possibility that, suspressen wouldn't work well because of differences in the log message. It is necessary to run the report with the timestamp removed for the full_log field. Use this sample script to create a report for the previous day. The cronjob should run the next day. Make sure you have configured the config.toml and config path in the python file.
+    Because of different timestamp an format of it, it is very difficulty to check if the same alert is alredy displayed. Because of this i used the following bash script that removes the leading timestamp of the full_log field. There is a possibility that, suspressen wouldn't work well because of differences in the log message.
+  - It is necessary to run the report with the timestamp removed for the full_log field. Use this sample script to create a report for the previous day. The cronjob should run the next day. Make sure you have configured the config.toml and config path in the python file.
     ```
     #!/bin/bash
     LOGFILEOSSEC=$(date +"/var/ossec/logs/alerts/%Y/%b/ossec-alerts-%d.json.gz" --date="yesterday")
