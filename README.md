@@ -5,10 +5,9 @@ A ossec installation is requierd. I used version 3.7.0.
 Move main.py to ```/var/ossec/bin/```
 Move config.toml to ```/var/ossec/etc/```   
 install following packages:
-- python3.9
-- toml
+- python3.9 or higher
+- toml (Included in Python 3.11)
 - python-regex 
-- Levenshtein
    
 Modify alerts json log path in cofnig.toml:
 ```
@@ -43,7 +42,7 @@ The script has following features:
 - Reporting alerts
   - Duplicated alerts will be suspressed except syscheck (FIM) (Every alert is a change in your system, and shouldn't be suspressed). Only the first alert will be shown. The script will append the "Duplicated messages suspressed!" and the total amount of this alert.
   - If decoder is unknown (=means no processed fields), alert 1002 (Unknown problem...) is raised or alert is a Windows alert, the script will append full log to line.
-    Because of different timestamp an format of it, it is very difficulty to check if the same alert is alredy displayed. Because of this i used the Levenshtein string     similarity to determine if a alert is eqaul. So there is a possibility, that some alerts, where i attach the full log will be suspressed, but actually should be d     displayed
+    Because of different timestamp an format of it, it is very difficulty to check if the same alert is alredy displayed. Because of this i used the following bash script that removes the leading timestamp of the full_log field. There is a possibility that, suspressen wouldn't work well because of differences in the log message.
   - At the end of report you get the number of all alerts, and the number of logs in the mail. You also get the state of your agents (Ok, when all connected or lists disconnected agents).
 - The script displays only existing fields, but you can configure in config.toml wich fields you want to see:
    ```
