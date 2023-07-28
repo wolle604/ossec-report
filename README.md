@@ -42,8 +42,14 @@ The script has following features:
 - Reporting alerts
   - Duplicated alerts will be suspressed except syscheck (FIM) (Every alert is a change in your system, and shouldn't be suspressed). Only the first alert will be shown. The script will append the "Duplicated messages suspressed!" and the total amount of this alert.
   - If decoder is unknown (=means no processed fields), alert 1002 (Unknown problem...) is raised or alert is a Windows alert, the script will append full log to line.
-    Because of different timestamp an format of it, it is very difficulty to check if the same alert is alredy displayed. Because of this i used the following bash script that removes the leading timestamp of the full_log field. There is a possibility that, suspressen wouldn't work well because of differences in the log message.
+    Because of different timestamp an format of it, it is very difficulty to check if the same alert is alredy displayed. Because of this i used the following bash script that removes the leading timestamp of the full_log field. There is a possibility that, suspressen wouldn't work well because of differences in the log message. It is necessary to run the report with the timestamp removed for the full_log field. Use this sample script to create a report for the previous day. The cronjob should run the next day. Make sure you have configured the config.toml and config path in the python file.
     ```
+    #!/bin/bash
+    LOGFILEOSSEC=$(date +"/var/ossec/logs/alerts/%Y/%b/ossec-alerts-%d.json.gz" --date="yesterday")
+    gzip -dc $LOGFILEOSSEC > /var/ossec/logs/alerts/alerts-logrotate.json
+    sed -E 's/"full_log":"[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}\.[0-9]{6}\+[0-9]{2}:[0-9]{2} /"full_log":"/g;s/"full_log":"[0-9]{4} \w{3} [0-9]{1,2} [0-9]{2}:[0-9]{2}:[0-9]{2} /"full_log":"/g;s/"full_log":"\w{3} [0-9]{1,2} [0-9]   {2}:[0-9]{2}:[0-9]{2} /"full_log":"/g;s/"full_log":"[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}\.[0-9]{3}Z /"full_log":"/g;s/"full_log":"[0-9]{10,13} /"full_log":"/g;s/"full_log":"[0-9]{6}\.[0-9]{6} /"full_log":"/g;s/"full_log":"[0-9]{2} \w{3} [0-9]{4} [0-9]{2}:[0-9]{2}:[0-9]{2} /"full_log":"/g;s/kernel: \[[0-9]{7}\.[0-9]{6}\]/[Time Removed]/g' /var/ossec/logs/alerts/alerts-logrotateraw.json > /var/ossec/logs/alerts/alerts-ogrotate.json
+    python3 /var/ossec/bin/ossec-report.py | mail -s "OSSEC Report from <your-server>" <your-mail>
+    rm /var/ossec/logs/alerts/alerts-logrotate*.json
     ```
   - At the end of report you get the number of all alerts, and the number of logs in the mail. You also get the state of your agents (Ok, when all connected or lists disconnected agents).
 - The script displays only existing fields, but you can configure in config.toml wich fields you want to see:
